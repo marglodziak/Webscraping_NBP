@@ -34,7 +34,7 @@ calendarFrame = tk.Frame(amountFrame)
 resultsFrame = tk.Frame(root, bg="#a7ab38")
 
 calendarFrame.grid()
-currencyList = ['dolar amerykański', 'euro', 'frank szwajcarski', 'funt szterling']
+currencyList = ['dolar amerykański', 'euro', 'frank szwajcarski', 'funt szterling', 'hrywna (Ukraina)']
 chosenCurrency = ''
 chosenDate = ''
 framesDict = {}
@@ -48,9 +48,17 @@ def showAndHideFrames(frameToShow, frameToHide=frameMain):
     if frameToHide is None:
         frameToShow.grid()
         return
-    if frameToHide != frameMain and frameToHide not in framesDict.values():
+    if frameToHide not in (frameMain, amountFrame, framesDict.values()):
         for child in frameToHide.winfo_children():
             child.destroy()
+    frameToHide.grid_remove()
+    frameToShow.grid()
+
+
+def shCalendarFrames(frameToShow, frameToHide):
+    if frameToHide is None:
+        frameToShow.grid()
+        return
     frameToHide.grid_remove()
     frameToShow.grid()
 
@@ -76,6 +84,10 @@ def wypisz(rate, date, rate_date, earnings):
     rateLabel.grid(row=3)
     gainLabel.grid(row=4)
     returnButton.grid(row=5)
+
+    for frame in framesDict:
+        framesDict[frame].destroy()
+    framesDict.clear()
 
 
 # Sekcja "O programie"
@@ -119,7 +131,7 @@ def createFrame(year, month):
         def saveDate(day, month, year):
             buttons[day+j-1]['state'] = tk.DISABLED
             if month == datetime.datetime.today().month:
-                for button in buttons[:datetime.datetime.today().day+j-1]:
+                for button in buttons[:datetime.datetime.today().day+j]:
                     if button != buttons[day+j-1]:
                         button['state'] = tk.NORMAL
             else:
@@ -164,7 +176,7 @@ def changeMonth(year, month, previousMonth, buttons=[]):
         year -= 1
     currentFrame = framesDict.get(str(previousYear)+'-'+str(previousMonth))
     newFrame = createFrame(year, month)
-    showAndHideFrames(newFrame, currentFrame)
+    shCalendarFrames(newFrame, currentFrame)
 
 
 # Funkcja zapisująca wybraną walutę do zmiennej globalnej
@@ -207,7 +219,6 @@ def chooseAmount():
             returnButton.grid(row=5)
         else:
             wypisz(rate, chosenDate, previous_date, amount)
-
     showAndHideFrames(amountFrame, currencyFrame)
     daytime = time.strftime("%Y-%m-%d")
     daytime = daytime.split('-')
@@ -257,6 +268,8 @@ def previous_day(current_date):
     day = str(day)
     if int(day) < 10:
         day = '0' + day
+    if int(month) < 10:
+        month = '0' + month
     return day+'-'+month+'-'+year
 
 
@@ -338,7 +351,7 @@ if __name__ == "__main__":
     # ekran główny, elementy
     frameMain.grid(row=0, column=0, columnspan=3, sticky='')
     welcomeText = tk.Label(frameMain, bg="#a7ab38",fg="#fdffba",
-                           text="Witaj w słowniku.\n\nWybierz z poniższych opcji, co chcesz zrobić:",
+                           text="Witaj w Kalkulatorze Walut.\n\nWybierz z poniższych opcji, co chcesz zrobić:",
                            font=welcomeFontBold)
 
     info = tk.Button(frameMain, text="O programie", font=welcomeFont, bg="#fffdbd", fg="#5c2500",
