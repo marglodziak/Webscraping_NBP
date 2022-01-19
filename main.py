@@ -21,6 +21,8 @@ entryFont = font.Font(size=30, family="Rasa")
 welcomeFont = font.Font(size=25, family="Rasa")
 welcomeFontBold = font.Font(size=25, family="Open Sans", weight="bold")
 mainFont = font.Font(size=20, family="Rasa")
+descFont = font.Font(size=15, family="Rasa")
+calendarFont = font.Font(size=15, family="Courier")
 
 # ramki
 frameMain = tk.Frame(root, bg="#a7ab38")
@@ -33,11 +35,15 @@ amountFrame = tk.Frame(root, bg="#a7ab38")
 calendarFrame = tk.Frame(amountFrame)
 resultsFrame = tk.Frame(root, bg="#a7ab38")
 
-calendarFrame.grid()
+calendarFrame.grid(columnspan=2)
 currencyList = ['dolar amerykański', 'euro', 'frank szwajcarski', 'funt szterling', 'hrywna (Ukraina)']
 chosenCurrency = ''
 chosenDate = ''
 framesDict = {}
+
+daytime = time.strftime("%Y-%m-%d")
+daytime = daytime.split('-')
+currentYear = daytime[0]
 
 
 # ----- FUNKCJE POMOCNICZE -----
@@ -71,19 +77,20 @@ def wypisz(rate, date, rate_date, earnings):
     gainComplete = "Przychód należny: " + str(round(earnings * rate, 2))
 
     showAndHideFrames(resultsFrame, amountFrame)
-    introLabel = tk.Label(resultsFrame, text="Dane do ewidencji:\n")
-    dateLabel = tk.Label(resultsFrame, text=dateComplete)
-    earningsLabel = tk.Label(resultsFrame, text=earningsComplete)
-    rateLabel = tk.Label(resultsFrame, text=rateComplete)
-    gainLabel = tk.Label(resultsFrame, text=gainComplete)
-    returnButton = tk.Button(resultsFrame, text="Powrót do ekranu głównego", command=lambda:[showAndHideFrames(frameMain, resultsFrame)])
+    introLabel = tk.Label(resultsFrame, text="Dane do ewidencji:\n", font=entryFont, bg="#a7ab38")
+    dateLabel = tk.Label(resultsFrame, text=dateComplete, font=mainFont, bg="#a7ab38")
+    earningsLabel = tk.Label(resultsFrame, text=earningsComplete, font=mainFont, bg="#a7ab38")
+    rateLabel = tk.Label(resultsFrame, text=rateComplete, font=mainFont, bg="#a7ab38")
+    gainLabel = tk.Label(resultsFrame, text=gainComplete, font=mainFont, bg="#a7ab38")
+    returnButton = tk.Button(resultsFrame, text="Powrót do ekranu głównego", font=mainFont, bg="#fffdbd",
+                             activebackground="#e3e08f", command=lambda: [showAndHideFrames(frameMain, resultsFrame)])
 
     introLabel.grid(row=0)
     dateLabel.grid(row=1)
     earningsLabel.grid(row=2)
     rateLabel.grid(row=3)
     gainLabel.grid(row=4)
-    returnButton.grid(row=5)
+    returnButton.grid(row=5, pady=10)
 
     for frame in framesDict:
         framesDict[frame].destroy()
@@ -94,19 +101,25 @@ def wypisz(rate, date, rate_date, earnings):
 def showInfo():
     showAndHideFrames(infoFrame)
     infoLabel = tk.Label(infoFrame, anchor='w', justify="left",
-                         text='Witaj w programie Kursy Walut! \nMój program ułatwi Ci wyszukanie odpowiedniego kursu, '
-                         'jeśli nie zarabiasz w złotówkach i prowadzisz ewidencję z uwzględnieniem aktualnych kursów '
-                         'walut, podanych na stronie NBP. \n\n'
-                         'Instrukcja obsługi:\n'
-                         '1) Wybierz odpowiednią walutę spośród podanych.\n'
-                         '2) Wybierz odpowiednią datę.\n'
-                         '3) Podaj zarobioną kwotę.\n\n'
-                         'Po wykonaniu szeregu operacji, program poda na wyjściu kurs waluty z odpowiedniego dnia oraz '
-                         'przeliczoną na złotówki kwotę, którą możesz wpisać do ewidencji. Powodzenia!')
-    returnButton = tk.Button(infoFrame, text="Powrót do ekranu głównego",
-                             command=lambda: [showAndHideFrames(frameMain, infoFrame)])
+                         text='Witaj w programie Kursy Walut!', font=entryFont, background="#a7ab38",
+                         foreground="#fdffba", pady=30)
+    infoLabel2 = tk.Label(infoFrame, anchor='w', justify="left",
+                          text='Mój program ułatwi Ci wyszukanie odpowiedniego kursu, jeśli nie zarabiasz w złotówkach'
+                               '\ni prowadzisz ewidencję z uwzględnieniem aktualnych kursów walut, '
+                               'podanych na stronie NBP. \n\n'
+                               'Instrukcja obsługi:\n'
+                               '1) Wybierz odpowiednią walutę spośród podanych.\n'
+                               '2) Wybierz odpowiednią datę.\n'
+                               '3) Podaj zarobioną kwotę.\n\n'
+                               'Po wykonaniu szeregu operacji, program poda na wyjściu kurs waluty z'
+                               'odpowiedniego dnia \n'
+                               'oraz przeliczoną na złotówki kwotę, którą możesz wpisać do ewidencji. Powodzenia!',
+                               font=welcomeFont, background="#a7ab38", foreground="#fdffba")
+    returnButton = tk.Button(infoFrame, text="Powrót do ekranu głównego", font=welcomeFont, bg="#fffdbd",
+                             activebackground="#e3e08f", command=lambda: [showAndHideFrames(frameMain, infoFrame)])
     infoLabel.grid(row=1, column=0)
-    returnButton.grid(row=2)
+    infoLabel2.grid(row=2, column=0)
+    returnButton.grid(row=3, pady=30)
 
 
 # Funkcja zwracająca liczbę dni w danym miesiącu
@@ -120,6 +133,34 @@ def howManyDays(month, year):
     return 28
 
 
+# Funkcja zmieniająca numer miesiąca na jego nazwę
+def monthToStr(month):
+    if month == 1:
+        return "Styczeń"
+    if month == 2:
+        return "Luty"
+    if month == 3:
+        return "Marzec"
+    if month == 4:
+        return "Kwiecień"
+    if month == 5:
+        return "Maj"
+    if month == 6:
+        return "Czerwiec"
+    if month == 7:
+        return "Lipiec"
+    if month == 8:
+        return "Sierpień"
+    if month == 9:
+        return "Wrzesień"
+    if month == 10:
+        return "Październik"
+    if month == 11:
+        return "Listopad"
+    if month == 12:
+        return "Grudzień"
+
+
 # Funkcja tworząca nową ramkę kalendarza
 def createFrame(year, month):
     if framesDict.get(str(year)+'-'+str(month)) is None:
@@ -130,7 +171,7 @@ def createFrame(year, month):
 
         def saveDate(day, month, year):
             buttons[day+j-1]['state'] = tk.DISABLED
-            if month == datetime.datetime.today().month:
+            if month == datetime.datetime.today().month and year == currentYear:
                 for button in buttons[:datetime.datetime.today().day+j]:
                     if button != buttons[day+j-1]:
                         button['state'] = tk.NORMAL
@@ -143,31 +184,45 @@ def createFrame(year, month):
             chosenDate = str(day) + '-' + str(month) + '-' + str(year)
         j = 0
         for i in range(datetime.datetime(int(year), int(month), 1).weekday()):
-            buttons.append(tk.Button(newFrame, text=""))
+            buttons.append(tk.Button(newFrame, text="  ", font=calendarFont))
             j += 1
 
         for i in range(j, howManyDays(month, year)+j):
-            buttons.append(tk.Button(newFrame, text=(i - j + 1), command=lambda i=i: [saveDate(i-j + 1, month, year)]))
-        if datetime.datetime.today().month == month:
+            if i-j+1 < 10:
+                t = '0' + str(i-j+1)
+            else:
+                t = str(i-j+1)
+            buttons.append(tk.Button(newFrame, text=t, font=calendarFont,
+                                     command=lambda i=i: [saveDate(i-j + 1, month, year)]))
+        if datetime.datetime.today().month == month and year == datetime.datetime.today().year:
             for button in buttons[j+datetime.datetime.today().day:]:
                 button['command'] = ''
-                button['text'] = ''
-        tk.Label(newFrame, text=month).grid(row=0, column=0)
-        tk.Button(newFrame, text='Poprzedni', command=lambda: [changeMonth(year, month-1, month,buttons)]).grid(row=0, column=1, columnspan=3)
-        if month != datetime.datetime.today().month:
-            tk.Button(newFrame, text='Następny', command=lambda: [changeMonth(year, month+1, month,buttons)]).grid(row=0, column=4, columnspan=3)
+                button['text'] = '  '
+        YEARS = [str(i) for i in range(int(currentYear), 2004, -1)]
+        variable = tk.StringVar(newFrame)
+        variable.set(YEARS[0])
+        w = tk.OptionMenu(newFrame, variable, *YEARS)
+        w.grid(row=0, column=8)
+        tk.Button(newFrame, text='Wybierz', command=lambda: [changeMonth(int(variable.get()), 1, month, year)]).grid(
+            row=1, column=8)
+        tk.Label(newFrame, text=monthToStr(month) + ' ' + str(year), font=mainFont).grid(row=0, columnspan=8, rowspan=2, pady=15)
+        tk.Button(newFrame, text='Poprzedni', command=lambda: [changeMonth(year, month-1, month, year, buttons)])\
+            .grid(row=2, column=8, padx=10)
+        if month != datetime.datetime.today().month or year != datetime.datetime.today().year:
+            tk.Button(newFrame, text='Następny', command=lambda: [changeMonth(year, month+1, month, year, buttons)])\
+                .grid(row=3, column=8, padx=10)
+
         for i in range(len(buttons)):
-            buttons[i].grid(row=(i // 7)+1, column=i % 7)
+            buttons[i].grid(row=(i // 7)+2, column=i % 7)
         framesDict[str(year)+'-'+str(month)] = newFrame
     return framesDict[str(year)+'-'+str(month)]
 
 
 # Funkcja zmieniająca okno kalendarza
-def changeMonth(year, month, previousMonth, buttons=[]):
-    if previousMonth != month:
+def changeMonth(year, month, previousMonth, previousYear, buttons=[]):
+    if previousMonth != month or previousYear != year:
         for button in buttons:
             button['state'] = tk.NORMAL
-    previousYear = year
     if month == 13:
         month = 1
         year += 1
@@ -192,8 +247,13 @@ def chooseCurrency():
     global chosenCurrency
     i = 0
     for el in currencyList:
-        tk.Button(currencyFrame, text=el, command=lambda i=i: [saveCurrency(i)]).grid(row=i)
+        tk.Button(currencyFrame, text=el, bg="#fffdbd", activebackground="#e3e08f", font=descFont,
+                  command=lambda i=i: [saveCurrency(i)]).grid(row=i, pady=(0,10))
         i += 1
+    closeBtn = tk.Button(currencyFrame, text="Powrót", font=welcomeFont, bg="#fffdbd", fg="#a30000",
+                         activebackground="#910000", activeforeground="white",
+                         command=lambda:[showAndHideFrames(frameMain, currencyFrame)])
+    closeBtn.grid(row=i, pady=10)
 
 
 # Obsługa okna wybierania daty i kwoty
@@ -211,26 +271,33 @@ def chooseAmount():
             triesNumber += 1
         if triesNumber == 5:
             showAndHideFrames(resultsFrame, amountFrame)
-            introLabel = tk.Label(resultsFrame, text="Nie znaleziono odpowiednich danych. Przepraszam.")
-            returnButton = tk.Button(resultsFrame, text="Powrót do ekranu głównego",
+            introLabel = tk.Label(resultsFrame, text="Nie znaleziono odpowiednich danych. Przepraszam.",
+                                  font=mainFont, bg="#a7ab38")
+            returnButton = tk.Button(resultsFrame, text="Powrót do ekranu głównego", font=mainFont, bg="#a7ab38",
                                      command=lambda: [showAndHideFrames(frameMain, resultsFrame)])
 
             introLabel.grid(row=0)
             returnButton.grid(row=5)
         else:
             wypisz(rate, chosenDate, previous_date, amount)
-    showAndHideFrames(amountFrame, currencyFrame)
+    shCalendarFrames(amountFrame, currencyFrame)
     daytime = time.strftime("%Y-%m-%d")
     daytime = daytime.split('-')
     TY = daytime[0]
     TM = daytime[1]
-    changeMonth(int(TY), int(TM), int(TM))
-    amountLabel = tk.Label(amountFrame, text="Podaj zarobioną kwotę: ")
-    entryAmount = tk.Entry(amountFrame)
+    changeMonth(int(TY), int(TM), int(TM), int(TY))
+    amountLabel = tk.Label(amountFrame, text="Podaj zarobioną kwotę: ", bg="#a7ab38", font=mainFont, pady=20)
+    entryAmount = tk.Entry(amountFrame, font=welcomeFont)
+
+    saveButton = tk.Button(amountFrame, text="Wybierz", command=saveAmount, font=mainFont,
+                           bg="#fffdbd", activebackground="#e3e08f")
+    closeBtn = tk.Button(amountFrame, text="Powrót", font=mainFont, bg="#910000", fg="#fffdbd",
+                         activebackground="#c50000", activeforeground="white",
+                         command=lambda: [shCalendarFrames(currencyFrame, amountFrame)])
     amountLabel.grid(row=1, column=0)
     entryAmount.grid(row=1, column=1)
-    saveButton = tk.Button(amountFrame, text="Wybierz", command=saveAmount)
-    saveButton.grid(row=2, column=2)
+    saveButton.grid(row=2, column=1, sticky='e', pady=10)
+    closeBtn.grid(row=3, column=1, sticky='e', pady=10)
 
 
 # Czy rok przestępny
