@@ -36,7 +36,8 @@ calendarFrame = tk.Frame(amountFrame)
 resultsFrame = tk.Frame(root, bg="#a7ab38")
 
 calendarFrame.grid(columnspan=2)
-currencyList = ['dolar amerykański', 'euro', 'frank szwajcarski', 'funt szterling', 'hrywna (Ukraina)']
+currencyList = {'dolar amerykański': '1 USD', 'euro': '1 EUR', 'frank szwajcarski': '1 CHF', 'funt szterling': '1 GBP',
+                'hrywna (Ukraina)': '1 UAH'}
 chosenCurrency = ''
 chosenDate = ''
 framesDict = {}
@@ -71,9 +72,10 @@ def shCalendarFrames(frameToShow, frameToHide):
 
 # Funkcja wypisująca wyniki
 def wypisz(rate, date, rate_date, earnings):
+    curr = list(currencyList.keys())[list(currencyList.values()).index(chosenCurrency)]
     dateComplete = "Data zamówienia: " + date
     earningsComplete = "Zarobek: " + str(earnings)
-    rateComplete = "Kurs z dnia poprzedzającego ("+chosenCurrency+', '+rate_date+"): " + str(rate)
+    rateComplete = "Kurs z dnia poprzedzającego ("+curr+', '+rate_date+"): " + str(rate)
     gainComplete = "Przychód należny: " + str(round(earnings * rate, 2))
 
     showAndHideFrames(resultsFrame, amountFrame)
@@ -182,6 +184,10 @@ def createFrame(year, month):
 
             global chosenDate
             chosenDate = str(day) + '-' + str(month) + '-' + str(year)
+            if month < 10:
+                chosenDate = str(day) + '-0' + str(month) + '-' + str(year)
+            if day < 10:
+                chosenDate = '0' + chosenDate
         j = 0
         for i in range(datetime.datetime(int(year), int(month), 1).weekday()):
             buttons.append(tk.Button(newFrame, text="  ", font=calendarFont))
@@ -198,7 +204,7 @@ def createFrame(year, month):
             for button in buttons[j+datetime.datetime.today().day:]:
                 button['command'] = ''
                 button['text'] = '  '
-        YEARS = [str(i) for i in range(int(currentYear), 2004, -1)]
+        YEARS = [str(i) for i in range(int(currentYear), 2001, -1)]
         variable = tk.StringVar(newFrame)
         variable.set(YEARS[0])
         w = tk.OptionMenu(newFrame, variable, *YEARS)
@@ -235,9 +241,9 @@ def changeMonth(year, month, previousMonth, previousYear, buttons=[]):
 
 
 # Funkcja zapisująca wybraną walutę do zmiennej globalnej
-def saveCurrency(nr):
+def saveCurrency(currency):
     global chosenCurrency
-    chosenCurrency = currencyList[nr]
+    chosenCurrency = currencyList[currency]
     chooseAmount()
 
 
@@ -248,7 +254,7 @@ def chooseCurrency():
     i = 0
     for el in currencyList:
         tk.Button(currencyFrame, text=el, bg="#fffdbd", activebackground="#e3e08f", font=descFont,
-                  command=lambda i=i: [saveCurrency(i)]).grid(row=i, pady=(0,10))
+                  command=lambda el=el: [saveCurrency(el)]).grid(row=i, pady=(0,10))
         i += 1
     closeBtn = tk.Button(currencyFrame, text="Powrót", font=welcomeFont, bg="#fffdbd", fg="#a30000",
                          activebackground="#910000", activeforeground="white",
@@ -395,12 +401,12 @@ def get_rate(href, date):
     for row in table:
         if a:
             break
-        row_td = row.find('td', class_="left")
+        row_td = row.find('td', class_="right")
         split = str(row_td).split('>')
         currency = ""
         if len(split) > 1:
             currency = split[1].split('<')
-            currency = currency[0]
+            currency = currency[0].replace('\xa0', ' ')
         if currency == chosenCurrency:  # zmienna globalna waluta #
             row_td2 = row.find_all('td', class_='right')
             row_td2 = str(row_td2[1]).split(">")
